@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zinkann Performance</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-16 0 270 185'%3E%3Cg transform='translate(16 0) skewX(-10)'%3E%3Cpolygon points='56,90 2,180 62,180 86,140'/%3E%3Cpolygon points='66,180 170,6 210,74 192,106 172,72 107,180'/%3E%3Cpolygon points='268,180 216,88 195,122 174,86 120,180'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Russo+One&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:#fff;color:#000;font-family:"Barlow","Helvetica Neue",Helvetica,Arial,sans-serif;line-height:1.6}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:20px 6vw;border-bottom:3px solid #000}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#000;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-weight:400;font-size:1.25rem;letter-spacing:.03em;text-transform:uppercase}
+.brand svg{width:56px;height:auto}
+nav a{color:#000;text-decoration:none;margin-left:22px;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-size:.9rem;font-weight:400;text-transform:uppercase;letter-spacing:.08em;padding-bottom:3px;border-bottom:3px solid transparent}
+nav a:hover,nav a.active{border-bottom-color:#F25C1E}
+.page{display:none;max-width:900px;margin:0 auto;padding:72px 6vw}
+.page.show{display:block}
+h2{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-weight:400;font-size:2rem;text-transform:uppercase;letter-spacing:.03em;margin:0 0 20px}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;margin-top:36px;align-items:start}
+.tier{border:3px solid #000;padding:32px 28px;background:#fff;color:#000;display:flex;flex-direction:column;position:relative;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease}
+.tier:hover{background:#000;color:#fff;transform:translateY(-8px) scale(1.02);box-shadow:0 14px 28px rgba(0,0,0,.25);z-index:2}
+.tier:hover .badge{background:#fff;color:#000}
+.badge{position:absolute;top:0;right:0;background:#F25C1E;color:#fff;padding:5px 18px;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase}
+.sub{font-weight:700;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin:6px 0 22px}
+.bar{height:5px;background:#000;margin:0 0 22px}
+.tier:hover .bar{background:#fff}
+.feat ul{list-style:none;padding:0;margin:0 0 30px}
+.feat li{padding:8px 0 8px 28px;position:relative}
+.feat li::before{content:"";position:absolute;left:4px;top:.95em;width:10px;height:10px;background:currentColor;transform:skewX(-20deg)}
+.cta{display:block;text-align:center;border:3px solid #000;color:#000;background:#fff;text-decoration:none;transform:skewX(-12deg);padding:14px;margin-top:auto}
+.cta span{display:inline-block;transform:skewX(12deg);font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.08em}
+.tier:hover .cta{background:#fff;color:#000;border-color:#fff}
+.cta:hover{background:#000;color:#fff}
+.tier:hover .cta:hover{background:#000;color:#fff;border-color:#fff}
+.tier h3{margin:0 0 4px;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.03em;font-size:1.3rem;font-weight:400;}
+.price{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-size:3.2rem;line-height:1;margin:0 0 22px}
+.price small{font-size:1.1rem}
+.btns{display:flex;flex-wrap:wrap;gap:16px;margin-top:36px}
+.btn{display:inline-block;padding:14px 28px;border:3px solid #000;color:#000;background:#fff;text-decoration:none;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.05em;font-size:.95rem}
+.btn.solid{background:#fff;color:#000}
+.btn:hover{background:#000;color:#fff}
+.btn.solid:hover{background:#000;color:#fff}
+footer{text-align:center;padding:28px 28px 72px;font-size:.85rem;border-top:1px solid #ddd}
+img.ph{display:block;width:100%;height:auto;object-fit:cover}
+.wide{margin:0 0 50px}
+.wide img{max-height:460px;object-position:50% 25%}
+.wide.road img{max-height:320px;object-position:50% 68%}
+.wide.road{margin-bottom:36px}
+.wide.blog{margin-bottom:36px}
+.wide.blog img{max-height:420px;object-position:50% 30%}
+.split{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:start}
+.split img{max-height:540px;object-position:50% 55%}
+.hcta{border:3px solid #000;background:#000;color:#fff;text-decoration:none;transform:skewX(-12deg);padding:8px 18px}
+.hcta span{display:inline-block;transform:skewX(12deg);font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.06em;font-size:.85rem}
+.hcta:hover{background:#fff;color:#000}
+.rf{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic}
+.climb{margin-top:24px}.climb svg{display:block;width:100%;height:auto}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 0}
+.ridge{animation:draw 1.8s ease both}@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.ridge{animation:none}}
+@media (max-width:600px){.step p{font-size:.85rem}.step h3{font-size:1rem}}
+.step{text-align:center;padding:0 4px}
+.step .n{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-size:2rem;line-height:1}
+.step h3{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;font-weight:400;font-size:1.15rem;margin:8px 0 6px}
+.step p{margin:0}
+.hwrap{margin-top:70px}
+.quotes blockquote{max-width:64ch}
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+blockquote{margin:0;padding:6px 0 6px 20px;border-left:5px solid #000;font-size:1.05rem}
+blockquote cite{display:block;margin-top:8px;font-style:normal;font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+.faq{margin-top:64px}
+.faq .q{font-weight:700;margin:22px 0 4px}
+.faq .a{margin:0;padding-bottom:18px;border-bottom:1px solid #ddd}
+.field{margin:0 0 16px}
+.field label{display:block;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;border:3px solid #000;background:#fff;color:#000;padding:10px 12px;font:inherit;border-radius:0}
+.field textarea{min-height:110px;resize:vertical}
+.ferr{color:#b00020;font-size:.9rem;min-height:1.3em;margin:0 0 8px}
+button.btn{cursor:pointer;font-size:.95rem}
+.bar{transform-origin:left;animation:grow .9s ease both}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.bar{animation:none}}
+@media (max-width:700px){.split{grid-template-columns:1fr}.hcta{margin-left:6px}}
+.btn,.hcta,.cta,.step,blockquote,img.ph,.brand,nav a{transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease}
+nav a{padding:4px 8px;margin-left:12px}
+nav a:hover{background:#000;color:#fff;transform:translateY(-2px)}
+.btn:hover{transform:translateY(-4px);box-shadow:0 8px 16px rgba(0,0,0,.25)}
+.hcta:hover{transform:translateY(-3px) skewX(-12deg);box-shadow:0 8px 16px rgba(0,0,0,.25)}
+.cta:hover,.tier:hover .cta:hover{transform:translateY(-3px) skewX(-12deg);box-shadow:0 8px 16px rgba(0,0,0,.25)}
+.step{padding:14px 8px;border:3px solid transparent}
+.step:hover{background:#000;color:#fff;transform:translateY(-6px) scale(1.02);box-shadow:0 12px 24px rgba(0,0,0,.25)}
+blockquote:hover{background:#000;color:#fff;padding-right:14px;transform:translateY(-4px);box-shadow:0 10px 20px rgba(0,0,0,.25)}
+img.ph{position:relative}
+img.ph:hover{transform:scale(1.02);box-shadow:0 14px 28px rgba(0,0,0,.3);z-index:2}
+.brand:hover{transform:translateY(-2px)}
+.step{cursor:pointer}
+.step.on{border-color:#000}
+#page-faq .faq{margin-top:0}
+.more{margin:30px 0 0;font-weight:700}
+.more a{color:#000}
+.posts{display:grid;gap:24px;margin-top:28px}
+.post{border:3px solid #000;padding:26px 28px;background:#fff;color:#000;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease}
+.post:hover{background:#000;color:#fff;transform:translateY(-6px);box-shadow:0 12px 24px rgba(0,0,0,.25)}
+.post .date{font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.post h3{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-weight:400;text-transform:uppercase;font-size:1.3rem;margin:6px 0 8px}
+.post p{margin:0}
+.split.blogtop{grid-template-columns:1fr 1fr;align-items:center;margin-bottom:36px}
+.split.blogtop img{max-height:none}
+@media (max-width:700px){.split.blogtop{grid-template-columns:1fr}}
+#page-about{max-width:none;padding:0}
+.inner{max-width:900px;margin:0 auto;padding:56px 6vw 72px}
+#page-about .hero{position:relative;display:flex;align-items:center;min-height:440px;background:#000;color:#fff;overflow:hidden;z-index:5;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),0 100%)}
+.hbg{position:absolute;right:0;top:0;width:64%;height:100%;object-fit:cover;object-position:55% 40%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 32%);mask-image:linear-gradient(90deg,transparent 0,#000 32%)}
+.htxt{position:relative;max-width:52%;padding:56px 4vw 84px 6vw}
+.htxt svg{display:block;width:84px;height:auto;margin-bottom:18px}
+.htxt h1{font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-weight:400;text-transform:uppercase;font-size:clamp(1.9rem,4.6vw,3rem);line-height:1.04;letter-spacing:.01em;margin:0 0 10px;text-wrap:balance}
+.htxt p{margin:0 0 26px;font-size:1.1rem;font-weight:600}
+.hbtns{display:flex;flex-wrap:wrap;gap:14px}
+.hb{display:inline-block;border:3px solid #fff;color:#fff;background:transparent;padding:12px 22px;text-decoration:none;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.05em;font-size:.88rem;transition:transform .25s ease,box-shadow .25s ease,background .25s ease,color .25s ease}
+.hb.wh{background:#fff;color:#000}
+.hb:hover{background:#fff;color:#000;transform:translateY(-4px);box-shadow:0 8px 16px rgba(255,255,255,.2)}
+.hb.wh:hover{background:#000;color:#fff}
+@media (max-width:720px){
+#page-about .hero{display:block;min-height:0}
+.hbg{position:relative;display:block;width:100%;height:250px;-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);mask-image:linear-gradient(180deg,#000 55%,transparent)}
+.htxt{max-width:none;padding:0 16px 80px;margin-top:-30px}
+.inner{padding:40px 6vw 56px}
+}
+#page-plans,#page-faq,#page-blog,#page-contact{max-width:none;padding:0}
+.inner.narrow{max-width:700px}
+.phero{position:relative;display:flex;align-items:center;min-height:260px;background:#000;color:#fff;overflow:hidden;z-index:5;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),0 100%)}
+.pbg{position:absolute;right:0;top:0;width:60%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 32%);mask-image:linear-gradient(90deg,transparent 0,#000 32%)}
+.pmark{position:absolute;right:4vw;bottom:-14px;width:min(36vw,360px);height:auto}
+.ptxt{position:relative;max-width:60%;padding:48px 4vw 72px 6vw}
+.phero h2{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;margin:0 0 8px;color:#fff}
+.phero p{margin:0;font-size:1.1rem;font-weight:600}
+@media (max-width:720px){
+.phero{display:block;min-height:0}
+.pbg{position:relative;display:block;width:100%;height:190px;-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent);mask-image:linear-gradient(180deg,#000 55%,transparent)}
+.ptxt{max-width:none;padding:0 16px 64px;margin-top:-24px}
+.phero.nopic .ptxt{margin-top:0;padding-top:40px}
+.pmark{display:none}
+}
+.sband{--s:20px;position:relative;margin-top:calc(var(--s) * -1);padding-block:calc(var(--s) + 44px) calc(var(--s) + 52px);clip-path:polygon(0 0,100% 0,100% calc(100% - var(--s)),0 100%)}
+.sband .inner{padding-top:0;padding-bottom:0}
+.sband .hwrap{margin-top:0}
+.sband.white{background:#fff}
+.sband.grey{background:#ececec}
+.sband.dark{background:#000;color:#fff;clip-path:none;padding-bottom:64px}
+.sband.dark h2{color:#fff}
+.sband.dark p{margin:0 0 22px;font-size:1.1rem;font-weight:600;max-width:60ch}
+.sband.last{clip-path:none}
+.z4{z-index:4}.z3{z-index:3}.z2{z-index:2}.z1{z-index:1}
+header{position:relative;z-index:50}
+.burger{display:none;flex:none;width:46px;height:40px;border:3px solid #000;background:#fff;padding:0;cursor:pointer;place-content:center;gap:5px;transform:skewX(-12deg)}
+.burger i{display:block;width:20px;height:3px;background:#000;transition:transform .25s ease,opacity .2s ease}
+.burger:focus-visible{outline:3px solid #000;outline-offset:3px}
+.mopen .burger{background:#000}
+.mopen .burger i{background:#fff}
+.mopen .burger i:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.mopen .burger i:nth-child(2){opacity:0}
+.mopen .burger i:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.mmenu{display:none}
+@media (max-width:720px){
+header{flex-wrap:nowrap;gap:10px;padding:12px 16px}
+.brand{min-width:0;font-size:.85rem;gap:9px;white-space:nowrap}
+.brand span{overflow:hidden;text-overflow:ellipsis}
+.brand svg{width:34px;flex:none}
+header nav,header .hcta{display:none}
+.burger{display:grid}
+.mmenu{display:block;position:absolute;left:0;right:0;top:100%;background:#000;color:#fff;padding:8px 16px 52px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),0 100%);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .25s ease,transform .25s ease,visibility .25s}
+.mopen .mmenu{opacity:1;visibility:visible;transform:none}
+main,footer{transition:opacity .25s ease}
+header.mopen ~ main,header.mopen ~ footer{opacity:.08}
+.mmenu a{display:block;padding:15px 4px;border-bottom:1px solid #333;color:#fff;text-decoration:none;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;font-size:1.25rem;letter-spacing:.04em}
+.mmenu a.on{border-bottom:3px solid #fff}
+.mmenu a.go{margin-top:22px;border:3px solid #fff;background:#fff;color:#000;text-align:center;font-size:.95rem;padding:13px}
+}
+@media (prefers-reduced-motion:reduce){.mmenu,.burger i{transition:none}}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:#fff}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:#fff}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.htxt,.ptxt{animation:rise .7s ease both}
+.rv{opacity:.3;transform:translateY(18px)}
+.rv.in{opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease}
+@media (prefers-reduced-motion:reduce){.htxt,.ptxt{animation:none}.rv{opacity:1;transform:none}}
+.hcta:hover{box-shadow:0 8px 16px rgba(242,92,30,.35)}
+.hb:hover{box-shadow:0 8px 16px rgba(242,92,30,.35)}
+.htxt h1::after,.phero h2::after,.sband.dark h2::after{content:"";display:block;width:64px;height:6px;margin-top:12px;background:#F25C1E;transform:skewX(-20deg);transform-origin:left}
+.feat li::before{background:#F25C1E}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:#F25C1E;box-shadow:0 0 0 3px rgba(242,92,30,.25)}
+#send:hover{background:#F25C1E;border-color:#F25C1E;color:#fff}
+#ivl .lead{max-width:60ch;margin:18px 0 28px;font-size:1.1rem}
+#ivl h2::after{content:"";display:block;width:64px;height:6px;margin-top:12px;background:#F25C1E;transform:skewX(-20deg);transform-origin:left}
+#ivl .tag{display:inline-block;font-family:"Russo One",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;background:#000;color:#fff;padding:4px 14px;margin-bottom:14px;transform:skewX(-12deg)}
+#ivl .card{background:#fff;border:3px solid #000;padding:20px 20px 12px}
+#ivl .stats{display:grid;grid-template-columns:repeat(2,1fr);margin:0 0 14px;border-bottom:3px solid #000;padding-bottom:14px}
+#ivl .stat{min-width:0;padding-right:10px}
+#ivl .stat b{display:block;font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;font-weight:400;font-size:clamp(1.3rem,4vw,2rem);line-height:1.1}
+#ivl .stat span{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#555}
+#ivl svg{display:block;width:100%;height:auto;overflow:visible}
+#ivl svg text{font-family:"Barlow",Arial,sans-serif;font-size:11px;fill:#000}
+#ivl .blk{fill:#F25C1E;opacity:.18;cursor:pointer;transition:opacity .2s}
+#ivl .blk:hover,#ivl .blk.on{opacity:.38}
+#ivl .ov{fill:#F25C1E;opacity:.3;pointer-events:none}
+#ivl .blkline{stroke:#F25C1E;stroke-width:3}
+#ivl #pw{fill:none;stroke:#000;stroke-width:1.6;stroke-linejoin:round}
+#ivl .draw{stroke-dasharray:1;stroke-dashoffset:0;animation:draw 2.2s ease-out}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+#ivl .readout{min-height:3.2em;margin:10px 0 6px;font-size:1rem}
+#ivl .readout b{font-family:"Russo One",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.04em;font-weight:400}
+#ivl .note{font-size:.8rem;color:#555;margin:6px 0 0}
+@media (max-width:560px){#ivl .card{padding:14px 12px 8px}#ivl svg text{font-size:22px}}
+@media (prefers-reduced-motion:reduce){#ivl .draw{animation:none}}
+.z0{z-index:0}
+.sl{display:inline-flex;align-items:center;gap:.4em;color:inherit;text-decoration:none;border-bottom:2px solid transparent}
+.sl:hover{border-bottom-color:#F25C1E}
+.si{width:1.15em;height:1.15em;flex:none}
+a.post{display:block;text-decoration:none}
+.post .more{display:inline-block;margin-top:12px;font-weight:700;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+@media (min-width:721px) and (max-width:1080px){header{flex-wrap:nowrap}.brand{font-size:1rem}nav a{margin-left:6px;font-size:.8rem}.hcta{display:none}}
+@media (min-width:721px){.hero{min-height:clamp(450px,32vw,580px)}.hbg{width:auto;height:100%;max-width:64%;aspect-ratio:16/9;object-position:55% 12%}.phero{min-height:clamp(280px,24vw,460px)}.pbg{object-position:50% 35%}#page-blog .pbg{object-position:50% 0%}#page-contact .pbg{width:44%;object-position:50% 22%}#page-plans .pbg{object-position:50% 55%}#page-faq .pbg{object-position:50% 23%}}
+.mcta{display:none}
+@media (max-width:720px){
+.mcta{display:block;position:fixed;left:0;right:0;bottom:0;z-index:55;background:#F25C1E;color:#fff;text-align:center;text-decoration:none;padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px));font-family:"Russo One","Arial Black",Arial,sans-serif;font-style:italic;text-transform:uppercase;letter-spacing:.08em;font-size:.95rem;box-shadow:0 -6px 16px rgba(0,0,0,.25);transition:transform .3s ease}
+.mcta.off{transform:translateY(110%)}
+body{padding-bottom:56px}
+}
+@media (prefers-reduced-motion:reduce){.mcta{transition:none}}
+.ferr.ok{font-weight:700;color:#000;border-left:4px solid #F25C1E;padding-left:10px}
+#editbar{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;gap:8px}
+#editbar button{background:#000;color:#fff;border:0;padding:10px 16px;font:inherit;font-size:.85rem;cursor:pointer}
+#editbar button.alt{background:#fff;color:#000;border:1px solid #000}
+body.editing [data-edit]{outline:1px dashed #888;outline-offset:3px;cursor:text}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="-16 0 270 185">
+    <g transform="translate(16 0) skewX(-10)">
+      <polygon points="56,90 2,180 62,180 86,140"/>
+      <polygon points="66,180 170,6 210,74 192,106 172,72 107,180"/>
+      <polygon points="268,180 216,88 195,122 174,86 120,180"/>
+    </g>
+  </symbol>
+</svg>
+
+<header>
+  <a class="brand" href="#about"><svg fill="#000" viewBox="0 0 270 185"><use href="#logo"/></svg><span>Zinkann Performance</span></a>
+  <nav><a href="#about" data-nav="about">Home</a><a href="#plans" data-nav="plans">Plans</a><a href="#faq" data-nav="faq">FAQ</a><a href="#blog" data-nav="blog">Blog</a><a href="#contact" data-nav="contact">Contact</a></nav>
+  <a class="hcta" href="#contact"><span>Let’s get faster</span></a>
+  <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="mnav" aria-label="Menu"><i></i><i></i><i></i></button>
+  <div class="mmenu" id="mnav" role="navigation" aria-label="Main menu"><a href="#about">Home</a><a href="#plans">Plans</a><a href="#faq">FAQ</a><a href="#blog">Blog</a><a href="#contact">Contact</a><a class="go" href="#contact">Let’s get faster</a></div>
+</header>
+
+<main>
+  <div class="page" id="page-about">
+    <div class="hero">
+      <img class="hbg" src="images/photo-727fb2bba8.jpg" alt="Michael Zinkann racing a night criterium">
+      <div class="htxt">
+        <svg fill="#fff" viewBox="0 0 270 185"><use href="#logo"/></svg>
+        <h1 data-edit="h1">Zinkann Performance</h1>
+        <p data-edit="tag3">Every watt has a purpose.</p>
+        <div class="hbtns"><a class="hb wh" href="#plans">Coaching plans</a><a class="hb" href="#contact">Let’s get faster</a></div>
+      </div>
+    </div>
+    <section class="sband white z4"><div class="inner">
+    <div class="split"><div>
+    <h2>Meet your coach</h2>
+    <div data-edit="about4">
+      <p>Michael Zinkann is a USA Cycling Level 3 Coach and Category 1 road racer based in Newnan, Georgia, specializing in road races, criteriums and gravel.</p>
+      <p>Known for his tactical sense, breakaway skill and aggressive racing style, Michael brings decades of elite-level race experience directly to his athletes. He currently races on the Domestic Elite team The Paceline Project p/b LC Food.</p>
+      <p>A proven winner at the highest levels of domestic racing, Michael’s career highlights include:</p>
+      <ul>
+        <li>1st – 2026 Georgia State Championship P1/2 Road Race</li>
+        <li>2nd – 2023 USA Cycling Masters National Championship Criterium</li>
+        <li>1st – Georgia State Road Race &amp; Criterium Championships (Masters)</li>
+        <li>Extensive experience in top-tier U.S. criterium blocks, including Athens Twilight, Speed Week, the USA Crits series, Gateway Cup and Armed Forces</li>
+      </ul>
+      <p>Professionally, Michael is an IT leader and Assistant Director for Coweta County Government, and he brings the same rigorous, data-driven approach to training. He uses TrainingPeaks and WKO5 to build precision training structures.</p>
+      <p>Michael is also a cycling and health advocate who serves on boards including Bike Coweta and Friends of the Linc.</p>
+      <p>Whether you want to master pack dynamics, rack up Strava KOMs, stand on the top step or simply improve your overall fitness, Michael provides the technical insight, motivation and individualized programming to bridge the gap between where you are now and your goals.</p>
+    </div>
+    <div class="btns">
+      <a class="btn" href="#plans">Coaching plans</a>
+      <a class="btn solid" href="#contact">Let’s get faster</a>
+    </div>
+    </div>
+    <img class="ph" src="images/photo-59108e6733.jpg" alt="Coach on the podium with arms raised">
+    </div>
+    </div></section>
+    <section class="sband grey z3"><div class="inner">
+    <div class="hwrap">
+    <h2>How it works</h2>
+    <div class="climb">
+    <svg viewBox="0 -16 900 231" role="img" aria-label="A climb from consult to assess to train">
+      <path d="M0 200 L90 178 L150 160 L230 138 L300 148 L380 120 L450 105 L520 114 L600 82 L680 72 L750 38 L820 54 L900 28 L900 215 L0 215Z" fill="#fff"/>
+      <path class="ridge" pathLength="1" stroke-dasharray="1" d="M0 200 L90 178 L150 160 L230 138 L300 148 L380 120 L450 105 L520 114 L600 82 L680 72 L750 38 L820 54 L900 28" fill="none" stroke="#000" stroke-width="4"/>
+      <path id="prog" d="M0 200 L90 178 L150 160 L230 138 L300 148 L380 120 L450 105 L520 114 L600 82 L680 72 L750 38 L820 54 L900 28" fill="none" stroke="#F25C1E" stroke-width="9" style="stroke-dasharray:0 99999"/>
+      <g stroke="#000" stroke-width="1" stroke-dasharray="3 3"><line x1="150" y1="170" x2="150" y2="215"/><line x1="450" y1="115" x2="450" y2="215"/><line x1="750" y1="48" x2="750" y2="215"/></g>
+      <g fill="#000">
+        <g transform="translate(150 160)"><rect x="-9" y="-9" width="18" height="18" transform="skewX(-12)"/></g>
+        <g transform="translate(450 105)"><rect x="-9" y="-9" width="18" height="18" transform="skewX(-12)"/></g>
+        <g transform="translate(750 38)"><rect x="-11" y="-11" width="22" height="22" transform="skewX(-12)"/></g>
+        <polygon fill="#F25C1E" points="734,13 734,-3 743,5 750,-8 757,5 766,-3 766,13"/><rect fill="#F25C1E" x="734" y="13" width="32" height="3"/><circle id="rider" r="9" cx="150" cy="160" fill="#fff" stroke="#000" stroke-width="4"/>
+      </g>
+    </svg>
+    <div class="steps">
+      <div class="step" data-x="150" tabindex="0" role="button"><h3 data-edit="s1h">Consult</h3><p data-edit="s1p">Tell me your goals, your schedule and the events that matter to you.</p></div>
+      <div class="step" data-x="450" tabindex="0" role="button"><h3 data-edit="s2h">Assess</h3><p data-edit="s2p">We set your power zones and build your starting profile.</p></div>
+      <div class="step" data-x="750" tabindex="0" role="button"><h3 data-edit="s3h">Train</h3><p data-edit="s3p">You get a structured plan in TrainingPeaks, adjusted as life happens.</p></div>
+    </div></div></div>
+    </div></section>
+    <section class="sband white z2" id="ivl"><div class="inner">
+    <div class="hwrap">
+<span class="tag">Sample workout</span>
+<h2>Every interval has a purpose</h2>
+<p class="lead">Here is how a session is built and tracked. Each over-under set swings 1 minute above threshold (Zone 5) and 2 minutes below it (Zone 3), 4 times per set, then every session gets reviewed afterward.</p>
+<div class="card">
+<div class="stats" id="stats"></div>
+<svg id="chart" viewBox="0 0 900 340" role="img" aria-label="Power in watts over 90 minutes with three 12-minute over-under sets"></svg>
+<div class="readout" id="readout"><b>Tap or hover a set</b> to see the numbers.</div>
+</div>
+<p class="note">Sample data for illustration. Zone 5 is about 110% of FTP and Zone 3 about 83%. Your zones are set from your own field test.</p>
+
+    </div></div></section>
+    <section class="sband grey z1"><div class="inner">
+    <div class="hwrap">
+    <h2>Athlete results</h2>
+    <div class="quotes">
+      <blockquote data-edit="q1b">“Michael has helped me become stronger, more confident, and more motivated on the bike with guidance that’s always tailored to me.”<cite>Jason E., Cat 4</cite></blockquote>
+    </div></div>
+    </div></section>
+    <section class="sband dark z0"><div class="inner">
+      <h2 data-edit="ctah">Ready to get faster?</h2>
+      <p data-edit="ctap">Book your free consultation and we’ll build a plan around your season.</p>
+      <a class="hb wh" href="#contact">Let’s get faster</a>
+    </div></section>
+  </div>
+
+  <div class="page" id="page-plans">
+    <div class="phero">
+      <img class="pbg" src="images/photo-4a380ee321.jpg" alt="Cyclist riding a mountain road" style="object-position:50% 75%">
+      <div class="ptxt"><h2>Plans</h2><p data-edit="svcintro">Choose the level of coaching that fits your goals.</p></div>
+    </div>
+    <section class="sband white z4"><div class="inner">
+    <div class="tiers">
+      <div class="tier">
+        <h3 data-edit="l1name">Level 1</h3>
+        <p class="sub" data-edit="l1sub">Cycling coaching</p>
+        <p class="price"><span data-edit="l1price">$150</span><small> / 4 weeks</small></p>
+        <div class="bar"></div>
+        <div class="feat" data-edit="l1list3"><ul>
+          <li>One-on-one coaching built around your schedule</li>
+          <li>Progressive training calendar in TrainingPeaks</li>
+          <li>TrainingPeaks Standard account included</li>
+          <li>Weekly check-in emails and progress updates</li>
+          <li>One progress call per block (start or end)</li>
+          <li>Email + TrainingPeaks messaging</li>
+          <li>Race prep and tactical planning for each event</li>
+        </ul></div>
+        <a class="cta" href="#contact"><span>Get started</span></a>
+      </div>
+      <div class="tier featured">
+        <div class="badge">Most popular</div>
+        <h3 data-edit="l2name">Level 2</h3>
+        <p class="sub" data-edit="l2sub">Cycling coaching</p>
+        <p class="price"><span data-edit="l2price">$200</span><small> / 4 weeks</small></p>
+        <div class="bar"></div>
+        <div class="feat" data-edit="l2list4"><ul>
+          <li>Everything in Level 1, plus:</li>
+          <li>TrainingPeaks Premium account with full performance tracking</li>
+          <li>Unlimited email + TrainingPeaks support</li>
+          <li>Individualized daily programming, adjusted weekly</li>
+          <li>Field testing to set precise power zones</li>
+          <li>Power file analysis + twice-weekly feedback</li>
+          <li>Onboarding power profile: strengths and limiters</li>
+          <li>Comprehensive race prep, including a call before race weekends</li>
+        </ul></div>
+        <a class="cta" href="#contact"><span>Get started</span></a>
+      </div>
+    </div>
+    </div></section>
+    <section class="sband dark z3"><div class="inner">
+      <h2 data-edit="plctah">Not sure which level fits?</h2>
+      <p data-edit="plctap">Book a free consultation and we’ll pick the right plan for your goals and schedule.</p>
+      <div class="hbtns"><a class="hb wh" href="#contact">Let’s get faster</a><a class="hb" href="#faq">Read the FAQ</a></div>
+    </div></section>
+  </div>
+
+  <div class="page" id="page-faq">
+    <div class="phero">
+      <img class="pbg" src="images/photo-04f3bb411f.jpg" alt="">
+      <div class="ptxt"><h2>FAQ</h2><p data-edit="faqsub">Answers about coaching, plans and getting started.</p></div>
+    </div>
+    <section class="sband white z4"><div class="inner">
+    <div class="faq">
+      <p class="q" data-edit="fq1">What is a 4-week block?</p>
+      <p class="a" data-edit="fa1">Coaching is billed every 4 weeks, and your training is planned in matching 4-week cycles.</p>
+      <p class="q" data-edit="fq2">Do I need a power meter?</p>
+      <p class="a" data-edit="fa2b">Yes. Both levels require a power meter. We also recommend training with a heart rate monitor.</p>
+      <p class="q" data-edit="fq3">Can I switch levels?</p>
+      <p class="a" data-edit="fa3">Yes. You can move between levels at the start of a new block.</p>
+      <p class="q" data-edit="fq4">What do I need to get started?</p>
+      <p class="a" data-edit="fa4b">Complete the onboarding form and book your free consultation. I’ll set up your TrainingPeaks account and take it from there.</p>
+      <p class="q" data-edit="fq5">What is No Coasting?</p>
+      <p class="a" data-edit="fa5d">On Zone 2 rides, keep your legs turning with steady pressure on the pedals. Go easy on the climbs, and push the pedals on the downhills and flats instead of coasting.</p>
+    </div>
+    </div></section>
+    <section class="sband grey z3"><div class="inner">
+    <div class="faq" style="margin-top:0">
+      <h2>Policies</h2>
+      <p class="q" data-edit="pq1">Billing and cancellation</p>
+      <p class="a" data-edit="pa1">Coaching is billed every 4 weeks. Cancel any time before your next block begins. Payment for a block already started is non-refundable.</p>
+      <p class="q" data-edit="pq2">Switching levels</p>
+      <p class="a" data-edit="pa2">You can change levels at the start of any new block.</p>
+      <p class="q" data-edit="pq3">Results</p>
+      <p class="a" data-edit="pa3">Results depend on your consistency, health and recovery, and can’t be guaranteed.</p>
+      <p class="q" data-edit="pq4">Health and risk</p>
+      <p class="a" data-edit="pa4">Cycling and structured training involve risk. Consult your doctor before beginning any training program, and train at your own risk.</p>
+      <p class="q" data-edit="pq5">Response times</p>
+      <p class="a" data-edit="pa5">Email and TrainingPeaks messages are answered within one business day.</p>
+      <p class="q" data-edit="pq6">Privacy</p>
+      <p class="a" data-edit="pa6">Your information is used only to provide coaching and is never sold.</p>
+    </div>
+    </div></section>
+    <section class="sband dark z2"><div class="inner">
+      <h2 data-edit="faqctah">Still have questions?</h2>
+      <p data-edit="faqctap">Send me a message and I’ll get back to you within one business day.</p>
+      <a class="hb wh" href="#contact">Contact me</a>
+    </div></section>
+  </div>
+
+  <div class="page" id="page-blog">
+    <div class="phero">
+      <img class="pbg" src="images/photo-b878cc92e5.jpg" alt="Michael Zinkann on the top step of the podium holding a trophy" style="object-position:50% 10%">
+      <div class="ptxt"><h2>Blog</h2><p data-edit="blogintro">Training notes, race stories and coaching tips.</p></div>
+    </div>
+    <section class="sband white z4"><div class="inner">
+    <div class="posts">
+<a class="post" href="blog/why-zone-2-matters.html"><div class="date">October 29, 2026</div><h3>Why Zone 2 matters</h3><p>Easy riding builds the aerobic engine that everything else depends on. Here is why it earns a place in every plan.</p><span class="more">Read article &rarr;</span></a>
+<a class="post" href="blog/how-to-corner.html"><div class="date">October 29, 2026</div><h3>How to corner</h3><p>Smooth, confident cornering saves energy and keeps you in the front of the bunch. Here are the basics.</p><span class="more">Read article &rarr;</span></a>
+<a class="post" href="blog/how-to-nail-your-first-ftp-test.html"><div class="date">October 29, 2026</div><h3>How to nail your first FTP test</h3><p>The 20-minute test is my standard way to set your FTP. Here is why, how to do it, and how the other tests compare.</p><span class="more">Read article &rarr;</span></a>
+<a class="post" href="blog/what-is-no-coasting.html"><div class="date">October 29, 2026</div><h3>What is No Coasting?</h3><p>A simple rule for Zone 2 rides: keep your legs turning and keep steady pressure on the pedals.</p><span class="more">Read article &rarr;</span></a>
+<a class="post" href="blog/what-is-durability.html"><div class="date">October 29, 2026</div><h3>What is durability?</h3><p>Durability is how well you hold your power late in a long ride or race. It is often what decides results.</p><span class="more">Read article &rarr;</span></a>
+
+</div>
+    </div></section>
+    <section class="sband dark z3"><div class="inner">
+      <h2 data-edit="blogctah">Want training like this?</h2>
+      <p data-edit="blogctap">Coaching is built around your schedule, your goals and your next race.</p>
+      <a class="hb wh" href="#contact">Let’s get faster</a>
+    </div></section>
+  </div>
+
+  <div class="page" id="page-contact">
+    <div class="phero">
+      <img class="pbg" src="images/photo-1e0cc87459.jpg" alt="Cyclist on a gravel road in the mountains" style="object-position:50% 38%">
+      <div class="ptxt"><h2>Contact</h2><p data-edit="contactsub">Let’s talk about your goals.</p></div>
+    </div>
+    <section class="sband grey z4"><div class="inner narrow">
+    <div data-edit="contact5">
+      <p>Ready to get started? Tell me about your goals and I’ll get back to you.</p>
+      <p>Email: coach@zinkannperformance.com<br><a class="sl" href="https://instagram.com/zinkannperformance" target="_blank" rel="noopener"><img class="si" src="images/photo-7eb63aeafb.png" alt="" width="20" height="20">@zinkannperformance</a><br><a class="sl" href="https://linktr.ee/mpzinkann" target="_blank" rel="noopener"><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>linktr.ee/mpzinkann</a></p>
+    </div>
+    </div></section>
+    <section class="sband white z3 last"><div class="inner narrow">
+    <div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>
+    <div class="field"><label for="f-email">Email</label><input id="f-email" type="email" autocomplete="email"></div>
+    <div class="field"><label for="f-phone">Phone</label><input id="f-phone" type="tel" autocomplete="tel"></div>
+    <div class="field"><label for="f-disc">Cycling discipline</label><select id="f-disc"><option value="">Select one</option><option>Road racing</option><option>Criterium</option><option>Gravel</option><option>Multiple / other</option></select></div>
+    <div class="field"><label for="f-msg">Anything else?</label><textarea id="f-msg"></textarea></div>
+    <div style="position:absolute;left:-9999px" aria-hidden="true"><label for="f-bot">Leave this empty</label><input id="f-bot" type="checkbox" tabindex="-1" autocomplete="off"></div>
+    <p class="ferr" id="f-err"></p>
+    <button type="button" id="send" class="btn solid">Send message</button>
+    <p style="font-size:.8rem;margin:14px 0 0;max-width:52ch">By sending this message you agree to the <a class="sl" href="terms.html" style="display:inline">Terms &amp; Privacy</a>.</p>
+    <a id="mlink" href="#contact" style="display:none"></a>
+    </div></section>
+  </div>
+</main>
+
+<footer><div data-edit="disc" style="margin-bottom:6px">Cycling and structured training involve risk. Consult your doctor before beginning any training program.</div><span data-edit="foot5">© Zinkann Performance · coach@zinkannperformance.com · <a class="sl" href="https://instagram.com/zinkannperformance" target="_blank" rel="noopener"><img class="si" src="images/photo-7eb63aeafb.png" alt="" width="20" height="20">@zinkannperformance</a> <a class="sl" href="https://linktr.ee/mpzinkann" target="_blank" rel="noopener"><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>linktr.ee/mpzinkann</a><br><a class="sl" href="terms.html">Terms &amp; Privacy</a></span></footer>
+
+
+<script>
+(function(){
+  var pages=["about","plans","faq","blog","contact"];
+  function route(){
+    var h=(location.hash||"").replace("#","");
+    if(pages.indexOf(h)<0)h="about";
+    pages.forEach(function(p){
+      document.getElementById("page-"+p).classList.toggle("show",p===h);
+      document.querySelector('[data-nav="'+p+'"]').classList.toggle("active",p===h);
+    });
+    window.scrollTo(0,0);
+  }
+  window.addEventListener("hashchange",route);
+  route();
+
+})();
+</script>
+<script>
+(function(){
+  var EMAIL="coach@zinkannperformance.com",KEY="164d7d73-6114-47e7-a033-02ae63de0caf";
+  var btn=document.getElementById("send"),err=document.getElementById("f-err");
+  btn.onclick=function(){
+    var g=function(i){return document.getElementById(i).value.trim();};
+    err.className="ferr";
+    if(!g("f-name")||!g("f-email")){err.textContent="Please add your name and email.";return;}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g("f-email"))){err.textContent="That email address doesn\u2019t look right. Please check it.";return;}
+    var bot=document.getElementById("f-bot");
+    if(bot&&bot.checked){return;}
+    err.textContent="Sending\u2026";btn.disabled=true;
+    fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({
+      access_key:KEY,
+      subject:"Coaching inquiry from "+g("f-name"),
+      from_name:"Zinkann Performance website",
+      name:g("f-name"),email:g("f-email"),phone:g("f-phone"),discipline:g("f-disc"),message:g("f-msg"),
+      botcheck:""
+    })}).then(function(r){return r.json();}).then(function(d){
+      btn.disabled=false;
+      if(d&&d.success){
+        err.className="ferr ok";err.textContent="Thanks, your message was sent. I\u2019ll get back to you soon.";
+        ["f-name","f-email","f-phone","f-disc","f-msg"].forEach(function(i){document.getElementById(i).value="";});
+      }else{err.textContent="Sorry, that didn\u2019t send. Please email "+EMAIL+" instead.";}
+    }).catch(function(){btn.disabled=false;err.textContent="Sorry, that didn\u2019t send. Please email "+EMAIL+" instead.";});
+  };
+})();
+</script>
+<script>
+(function(){
+  var prog=document.getElementById("prog"),rider=document.getElementById("rider");
+  var steps=[].slice.call(document.querySelectorAll(".step"));
+  var total=0,cur=0,raf=0,ready=false,lens=[];
+  function set(l){
+    cur=l;
+    prog.style.strokeDasharray=l+" "+total;
+    var p=prog.getPointAtLength(l);
+    rider.setAttribute("cx",p.x);rider.setAttribute("cy",p.y);
+  }
+  function mark(i){steps.forEach(function(s,j){s.classList.toggle("on",j===i);});}
+  function init(){
+    if(ready)return true;
+    try{total=prog.getTotalLength();}catch(e){return false;}
+    if(!total)return false;
+    steps.forEach(function(s){
+      var x=+s.dataset.x,lo=0,hi=total;
+      for(var k=0;k<30;k++){var m=(lo+hi)/2;if(prog.getPointAtLength(m).x<x)lo=m;else hi=m;}
+      lens.push(hi);
+    });
+    ready=true;set(lens[0]);mark(0);return true;
+  }
+  function go(i){
+    if(!init())return;
+    mark(i);
+    var from=cur,to=lens[i];
+    cancelAnimationFrame(raf);
+    if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches){set(to);return;}
+    var t0=null,d=Math.max(500,Math.min(1100,Math.abs(to-from)*1.6));
+    function f(ts){
+      if(t0===null)t0=ts;
+      var k=Math.min(1,(ts-t0)/d),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      set(from+(to-from)*e);
+      if(k<1)raf=requestAnimationFrame(f);
+    }
+    raf=requestAnimationFrame(f);
+  }
+  steps.forEach(function(s,i){
+    s.addEventListener("click",function(){if(!document.body.classList.contains("editing"))go(i);});
+    s.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!document.body.classList.contains("editing")){e.preventDefault();go(i);}});
+  });
+  init();
+  window.addEventListener("hashchange",function(){setTimeout(init,0);});
+})();
+</script>
+<script>
+(function(){
+  var hd=document.querySelector("header"),b=document.getElementById("burger"),m=document.getElementById("mnav");
+  var links=[].slice.call(m.querySelectorAll("a"));
+  function set(o){hd.classList.toggle("mopen",o);b.setAttribute("aria-expanded",o?"true":"false");}
+  b.addEventListener("click",function(){set(!hd.classList.contains("mopen"));});
+  links.forEach(function(a){a.addEventListener("click",function(){set(false);});});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});
+  document.addEventListener("click",function(e){if(!hd.contains(e.target))set(false);});
+  function mark(){var cur=location.hash||"#about";links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")===cur&&!a.classList.contains("go"));});}
+  window.addEventListener("hashchange",function(){mark();set(false);});
+  mark();
+})();
+</script>
+<a class="mcta" id="mcta" href="#contact"><span>Let’s get faster</span></a>
+<script>(function(){function m(){var c=document.getElementById("mcta");if(c)c.classList.toggle("off",location.hash==="#contact");}m();window.addEventListener("hashchange",m);})();</script>
+<script>
+(function(){
+  if(!("IntersectionObserver" in window))return;
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  var done=new WeakSet();
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});
+  },{threshold:.08,rootMargin:"0px 0px -6% 0px"});
+  function setup(){
+    var pg=document.querySelector(".page.show");
+    if(!pg)return;
+    [].slice.call(pg.querySelectorAll(".sband .inner > *:not(.tiers):not(.steps), .tiers > *, .steps > *")).forEach(function(el){
+      if(done.has(el))return;
+      done.add(el);
+      if(el.getBoundingClientRect().top>window.innerHeight*0.92){
+        var i=Array.prototype.indexOf.call(el.parentNode.children,el);
+        el.style.transitionDelay=Math.min(i*70,280)+"ms";
+        el.classList.add("rv");
+        io.observe(el);
+        setTimeout(function(){el.classList.remove("rv","in");el.style.transitionDelay="";},2200);
+      }
+    });
+  }
+  setup();
+  window.addEventListener("hashchange",function(){setTimeout(setup,60);});
+})();
+</script>
+<script>
+
+(function(){
+var FTP=300,DUR=90,STEP=10; // seconds per sample
+function rnd(i){var x=Math.sin(i*12.9898)*43758.5453;return x-Math.floor(x)} // deterministic noise
+var ints=[[20,32],[42,54],[64,76]],OVER=330,UNDER=250;
+function over(m,a){return (m-a)%3<1}
+function target(m){
+  if(m<15)return 120+m*5; // warm-up ramp
+  if(m<20)return m%2<1?260:150; // openers
+  for(var k=0;k<ints.length;k++){if(m>=ints[k][0]&&m<ints[k][1])return over(m,ints[k][0])?OVER+k*2:UNDER+k*2}
+  if(m>=76)return Math.max(110,190-(m-76)*6);
+  return 145;
+}
+var pts=[];
+for(var s=0;s<=DUR*60;s+=STEP){
+  var m=s/60,t=target(m),n=(rnd(s/STEP)-.5)*(t>225?12:24);
+  var ramp=1;
+  pts.push([m,Math.round(Math.max(60,t*ramp+n))]);
+}
+var W=900,H=340,L=44,R=12,T=28,B=34,X=function(m){return L+(W-L-R)*m/DUR},Y=function(w){return T+(H-T-B)*(1-w/400)};
+var svg=document.getElementById("chart"),h="";
+[0,100,200,300,400].forEach(function(w){h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(w)+'" y2="'+Y(w)+'" stroke="#000" stroke-opacity="'+(w?.12:.5)+'"/><text x="'+(L-8)+'" y="'+(Y(w)+4)+'" text-anchor="end">'+w+'</text>'});
+for(var m=0;m<=DUR;m+=10)h+='<text x="'+X(m)+'" y="'+(H-12)+'" text-anchor="middle">'+m+'</text>';
+h+='<text x="'+L+'" y="'+(H-0)+'" font-size="10" style="letter-spacing:.08em">MINUTES</text><text x="'+(L-8)+'" y="'+(T-3)+'" text-anchor="end" font-size="10">W</text>';
+ints.forEach(function(iv,i){for(var q=iv[0];q<iv[1];q+=3)h+='<rect class="ov" x="'+X(q)+'" y="'+Y(400)+'" width="'+(X(q+1)-X(q))+'" height="'+(H-T-B)+'"/>'});
+ints.forEach(function(iv,i){h+='<g><rect class="blk" data-i="'+i+'" x="'+X(iv[0])+'" y="'+T+'" width="'+(X(iv[1])-X(iv[0]))+'" height="'+(H-T-B)+'"/><line class="blkline" x1="'+X(iv[0])+'" x2="'+X(iv[1])+'" y1="'+T+'" y2="'+T+'"/><text x="'+((X(iv[0])+X(iv[1]))/2)+'" y="'+(T+16)+'" text-anchor="middle" style="font-weight:600;letter-spacing:.06em">SET '+(i+1)+'</text></g>'});
+h+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(FTP)+'" y2="'+Y(FTP)+'" stroke="#000" stroke-width="1.5" stroke-dasharray="6 5"/><text x="'+(L+6)+'" y="'+(Y(FTP)-6)+'" style="font-weight:600">FTP '+FTP+' W</text>';
+var d=pts.map(function(p,i){return(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)}).join("");
+h+='<path id="pw" class="draw" pathLength="1" d="'+d+'"/>';
+svg.innerHTML=h;
+function stat(i){var a=ints[i][0],b=ints[i][1],v=pts.filter(function(p){return p[0]>=a&&p[0]<b}).map(function(p){return p[1]});var avg=Math.round(v.reduce(function(x,y){return x+y},0)/v.length);return{avg:avg,pct:Math.round(avg/FTP*100)}}
+var all=ints.map(function(_,i){return stat(i)}),avgAll=Math.round(all.reduce(function(a,s){return a+s.avg},0)/all.length);
+document.getElementById("stats").innerHTML=[["1 h 30","Duration"],["3 × 12 min","Over-unders"]].map(function(s){return'<div class="stat"><b>'+s[0]+'</b><span>'+s[1]+'</span></div>'}).join("");
+var ro=document.getElementById("readout");
+function show(i){var s=all[i];document.querySelectorAll(".blk").forEach(function(r){r.classList.toggle("on",+r.dataset.i===i)});ro.innerHTML='<b>Set '+(i+1)+'</b> · 12 min · 4 × (1 min Zone 5 + 2 min Zone 3)'}
+document.querySelectorAll(".blk").forEach(function(r){var i=+r.dataset.i;r.addEventListener("mouseenter",function(){show(i)});r.addEventListener("click",function(){show(i)});r.addEventListener("touchstart",function(){show(i)},{passive:true})});
+})();
+
+</script>
+</body>
+</html>
+
+</body></html>

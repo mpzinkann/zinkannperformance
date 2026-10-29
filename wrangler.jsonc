@@ -1,0 +1,9 @@
+{
+  // Cloudflare settings for the Zinkann Performance website.
+  // The name must match the project name in the Cloudflare dashboard.
+  "name": "zinkannperformance",
+  "compatibility_date": "2026-10-29",
+  "assets": {
+    "directory": "./public"
+  }
+}
