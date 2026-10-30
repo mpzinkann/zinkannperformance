@@ -21,7 +21,9 @@ This repo is the live website for **zinkannperformance.com**, a cycling coaching
 ## Files
 
 - `wrangler.jsonc`: Cloudflare settings. `name` must stay `zinkannperformance`. Publishes the `public/` folder. The empty `previews` block is required, or preview builds fail.
-- `public/index.html`: the main site. One page with sections switched by URL hash: `#about` (Home), `#plans`, `#faq`, `#blog`, `#contact`.
+- `public/index.html`: the main page. Sections switched by URL hash: `#about` (Home), `#blog`, `#contact`. Old `#plans` and `#faq` links redirect to the pages below.
+- `public/plans.html` and `public/faq.html`: separate pages (better for Google). They are copies of the index shell (header, footer, styles, menu script) with only their own section. **A change to the header, footer, nav or shared CSS must be made in index.html, plans.html, faq.html, terms.html and every blog post.**
+- `public/sitemap.xml` and `robots.txt`: for Google. Add new pages to the sitemap.
 - `public/blog/*.html`: individual blog posts (cornering, first FTP test, durability, No Coasting, Zone 2).
 - `public/terms.html`: Terms and Privacy page, linked from the footer and the contact form.
 - `public/images/`: photos. They're stored as separate files, not embedded in the HTML, so pages load fast.
@@ -45,5 +47,4 @@ This repo is the live website for **zinkannperformance.com**, a cycling coaching
 - Page description and a sharing preview image (Open Graph tags), so links look good when shared.
 - Google Search Console setup.
 - Cloudflare Web Analytics.
-- Separate pages for Plans and FAQ, to help with Google search.
 - The footer used to read "© 2026 Zinkann Performance". A later update removed the year, and it's worth re-adding if the owner wants it.
